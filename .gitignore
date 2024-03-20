@@ -19,3 +19,8 @@
 
 # Go workspace file
 go.work
+
+#Environment variables
+.env
+.env.local
+.env.production
