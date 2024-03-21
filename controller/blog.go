@@ -37,9 +37,21 @@ func GetBlogsByUser(c *gin.Context){
 }
 
 func GetBlogById(c *gin.Context) {
+	id := c.Param("id")
+
+	blogID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
 	blog := model.Blog{}
-	db.Database.Preload("User").Preload("Comments").First(&blog, c.Param("id"))
-	c.JSON(200, gin.H{"blog": blog})
+	if result := db.Database.First(&blog, blogID); result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": result.Error.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"blog": blog})
 }
 
 func CreateBlog(c *gin.Context){
