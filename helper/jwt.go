@@ -3,8 +3,10 @@ package helper
 import (
 	"blog/model"
 	"errors"
+	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -37,7 +39,7 @@ func ValidateJWT(context *gin.Context) error {
 		return nil
 	}
 
-	return errors.New("Invalid token provided.")
+	return errors.New("invalid token provided")
 }
 
 func CurrentUser(context *gin.Context)(model.User, error){
@@ -59,6 +61,28 @@ func CurrentUser(context *gin.Context)(model.User, error){
 		return model.User{}, err
 	}
 
-	return user, nil
+	return *user, nil
 }
 
+func getToken(context *gin.Context)(*jwt.Token, error){
+	tokenString := getTokenFromRequest(context)
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+
+		return privateKey, nil
+	})
+
+	return token, err
+}
+
+func getTokenFromRequest(context *gin.Context) string {
+	bearerToken := context.Request.Header.Get("Authorization")
+	splitToken := strings.Split(bearerToken, " ")
+
+	if len(splitToken) != 2 {
+		return ""
+	}
+	return splitToken[1]
+}
