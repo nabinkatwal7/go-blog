@@ -35,3 +35,16 @@ func (user *User) BeforeSave(*gorm.DB) error {
 	user.ConfirmPassword = string(passwordHash)
 	return nil
 }
+
+func FindUserByEmail(email string) (*User, error) {
+	var user User
+	err := db.Database.Where("email = ?", email).First(&user).Error
+	if err != nil {
+		return &User{}, err
+	}
+	return &user, err
+}
+
+func (user *User) ValidatePassword(password string) error {
+	return bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+}
