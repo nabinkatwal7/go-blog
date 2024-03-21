@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"blog/controller"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,10 @@ func ServeApplication() {
 			"message": "Server responded with status code 200",
 		})
 	})
-	router.Run("localhost:8080")
+
+	publicRoutes := router.Group("/auth")
+	publicRoutes.POST("/register", controller.Register)
+
+	router.Run(":8080")
 	fmt.Println("Server started on Port 8080")
 }
