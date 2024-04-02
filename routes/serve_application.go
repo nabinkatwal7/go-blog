@@ -26,6 +26,10 @@ func ServeApplication() {
 
 	protectedRoutes := router.Group("/api")
 	protectedRoutes.GET("/blogs", controller.GetAllBlogs)
+	protectedRoutes.POST("/blogs", controller.CreateBlog)
+	protectedRoutes.GET("/blogs/:id", controller.GetBlogById)
+	protectedRoutes.PUT("/blogs/:id", controller.UpdateBlog)
+	protectedRoutes.DELETE("/blogs/:id", controller.DeleteBlog)
 
 	router.Run(":8080")
 	fmt.Println("Server started on Port 8080")
